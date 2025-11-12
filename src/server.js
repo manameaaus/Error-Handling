@@ -10,6 +10,10 @@ app.use('/products', productRoutes);
 
 // [To-Do 6] 👉 Handle unknown routes here (404)
 
+app.use((req,res) => {
+    res.status(404).json({error:"Route not found"});
+})
+
 app.use(errorHandler);
 
 const PORT = 4545;

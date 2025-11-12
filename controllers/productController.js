@@ -19,6 +19,8 @@ const writeData = async (data) => {
 export const getAllProducts = async (req, res, next) => {
   try {
     // [To-Do 3] 👉 Read products from JSON file
+    const data = await readFile();
+    res.status(200).json(data);
 
   } catch (err) {
     next(err);
@@ -27,14 +29,41 @@ export const getAllProducts = async (req, res, next) => {
 
 export const getProductById = async (req, res, next) => {
     // [To-Do 2] 👉 Fetch product by id successfully
-    // [To-Do 5] 👉 Handle product not found scenario and get Product by Id
+    try {
+      const id = req.body.id;
+      const data = await readData();
+      const found = data.filter(p => p.id === id);
+  
+      if (found) {
+        res.status(200).json(found);
+      }
+  
+      // [To-Do 5] 👉 Handle product not found scenario and get Product by Id
+      else {
+        res.status(404).json({error:"Product not found"});
+      }
+    } catch(err) {
+      next(err);
+    }
 
 };
 
 export const addProduct = async (req, res, next) => {
   try {
     // [To-Do 1] 👉 Create product successfully
+    const name = req.body.name;
+    const price = req.body.price;
+    if (!name || !price) {
+      res.status(400).json({error:"Invalid product data"});
+    }
     // [To-Do 4] 👉 Handle Invalid product data scenario and create a new product
+    else {
+      const data = await readData();
+      const newProduct = {id:data.length,name,price};
+      data = [...data,newProduct];
+      await writeData(data);
+      res.status(201).json(newProduct);
+    }
 
   } catch (err) {
     next(err);
